@@ -16,6 +16,27 @@ const config = {
     new HtmlWebpackPlugin({
       template: "./src/index.html",
     }),
+    new ImageMinimizerPlugin({
+      minimizerOptions: {
+        // Lossless optimization with custom option
+        // Feel free to experiment with options for better result for you
+        plugins: [
+          ["gifsicle", { interlaced: true }],
+          ["jpegtran", { progressive: true }],
+          ["optipng", { optimizationLevel: 5 }],
+          [
+            "svgo",
+            {
+              plugins: [
+                {
+                  removeViewBox: false,
+                },
+              ],
+            },
+          ],
+        ],
+      },
+    }),
   ],
   mode: "development",
   devtool: "eval-cheap-source-map",
@@ -31,22 +52,15 @@ const config = {
         test: /\.scss$/,
         use: ["style-loader", "css-loader", "sass-loader"],
       },
-      //   {
-      //     test: /\.(png|jpe?g|webp|git|svg|)$/i,
-      //     use: [
-      //       {
-      //         loader: "img-optimize-loader",
-      //       },
-      //     ],
-      //   },
-      // {
-      //   test: /\.(png|jpe?g|gif)$/i,
-      //   use: [
-      //     {
-      //       loader: "file-loader",
-      //     },
-      //   ],
-      // },
+      {
+        test: /\.(?:ico|gif|png|jpg|jpeg)$/i,
+        type: "asset",
+        loader: "file-loader",
+        options: {
+          name: "[name].[ext]",
+          outputPath: "images",
+        },
+      },
       {
         test: /\.js$/,
         exclude: /(node_modules|bower_components)/,
